@@ -33,7 +33,10 @@ These modes enable a unified approach to data integration, allowing for seamless
 
 Discovery mode is invoked using the `discover` command:
 
-snowpilot discover --config config.json
+`snowpilot discover --config=<config_file_path>`
+
+Here's a concrete example:
+`snowpilot discover --config=config.json`
 
 In this mode, the connector outputs metadata about streams and relationships it knows about, including schemas for create, update, upsert, and delete operations.
 
@@ -41,7 +44,10 @@ In this mode, the connector outputs metadata about streams and relationships it 
 
 Extract mode is invoked using the `extract` command:
 
-snowpilot extract --config=config.json --stream=<stream_id> --fields=id,email,name
+`snowpilot extract --config=config.json --stream=<stream_id> --fields=<fields>`
+
+Here's a concrete example:
+`snowpilot extract --config=config.json --stream=users --fields=id,name,email`
 
 In this mode, the connector acts as an extractor, producing schema and record messages. The `--stream` flag specifies the stream ID to extract from, and the `--fields` flag allows for a comma-separated list of fields to extract.
 
@@ -49,7 +55,10 @@ In this mode, the connector acts as an extractor, producing schema and record me
 
 Load mode is invoked using the `load` command-line argument along with `--stream`, `--operation`, and `--fields` arguments:
 
-snowpilot load --config=config.json --stream=<stream_id> --operation=<operation_name> --fields=email,firstname,lastname
+`snowpilot load --config=<config_file_path> --stream=<stream_id> --operation=<operation_name> --fields=<fields>`
+
+Here's a concrete example:
+`snowpilot load --config=config.json --stream=users --operation=upsert --fields=id,name,email`
 
 In this mode, the connector acts as a loader, consuming schema and record messages. It performs operations based on the specified `<operation_name>` argument (e.g., insert, update, upsert) for the specified `<stream_id>`, focusing on the fields listed in the `--fields` argument.
 
@@ -57,68 +66,117 @@ In this mode, the connector acts as a loader, consuming schema and record messag
 
 The JSON output for the discovery mode follows the Snowpilot Connector format, which includes schemas of available streams, their properties, and separate schemas for different operations. An example of the output is as follows:
 
+```json
 {
-"streams": [
-{
-"id": "users",
-"name": "Users",
-"schema": {
-"row": {
-"type": "object",
-"properties": {
-"id": {"type": "integer"},
-"name": {"type": "string"},
-"email": {"type": "string", "format": "email"},
-"created_at": {"type": "string", "format": "date-time"}
-},
-"required": ["id"]
-},
-"insert": {
-"type": "object",
-"properties": {
-"name": {"type": "string"},
-"email": {"type": "string", "format": "email"}
-},
-"required": ["name", "email"]
-},
-"update": {
-"type": "object",
-"properties": {
-"id": {"type": "integer"},
-"name": {"type": "string"},
-"email": {"type": "string", "format": "email"}
-},
-"required": ["id"]
-},
-"upsert": {
-"type": "object",
-"properties": {
-"id": {"type": "integer"},
-"name": {"type": "string"},
-"email": {"type": "string", "format": "email"}
-},
-"required": ["name", "email"]
-},
-"delete": {
-"type": "object",
-"properties": {
-"id": {"type": "integer"}
-},
-"required": ["id"]
+  "streams": [
+    {
+      "id": "users",
+      "name": "Users",
+      "schema": {
+        "row": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "integer"
+            },
+            "name": {
+              "type": "string"
+            },
+            "email": {
+              "type": "string",
+              "format": "email"
+            },
+            "created_at": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          "required": [
+            "id"
+          ]
+        },
+        "insert": {
+          "type": "object",
+          "properties": {
+            "name": {
+              "type": "string"
+            },
+            "email": {
+              "type": "string",
+              "format": "email"
+            }
+          },
+          "required": [
+            "name",
+            "email"
+          ]
+        },
+        "update": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "integer"
+            },
+            "name": {
+              "type": "string"
+            },
+            "email": {
+              "type": "string",
+              "format": "email"
+            }
+          },
+          "required": [
+            "id"
+          ]
+        },
+        "upsert": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "integer"
+            },
+            "name": {
+              "type": "string"
+            },
+            "email": {
+              "type": "string",
+              "format": "email"
+            }
+          },
+          "required": [
+            "name",
+            "email"
+          ]
+        },
+        "delete": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "integer"
+            }
+          },
+          "required": [
+            "id"
+          ]
+        }
+      },
+      "relationships": [
+        {
+          "foreign_key_name": "user_orders",
+          "columns": [
+            "id"
+          ],
+          "is_one_to_one": false,
+          "referenced_stream": "orders",
+          "referenced_columns": [
+            "user_id"
+          ]
+        }
+      ]
+    }
+  ]
 }
-},
-"relationships": [
-{
-"foreign_key_name": "user_orders",
-"columns": ["id"],
-"is_one_to_one": false,
-"referenced_stream": "orders",
-"referenced_columns": ["user_id"]
-}
-]
-}
-]
-}
+```
 
 Snowpilot Connectors operate in three distinct modes, each invoked by a specific command-line argument:
 
@@ -264,20 +322,20 @@ print(json.dumps(sinks, indent=2))
 
 ## Glossary
 
-- **snowpilot_connector**: A component that can act as both a source and a destination for data, supporting discovery, extraction, and loading operations.
+- **Snowpilot connector**: A component that can act as both a source and a destination for data, supporting discovery, extraction, and loading operations.
 - **stream**: A collection of data, typically representing a table or API endpoint.
-- **discovery_mode**: A feature of connectors that allows programmatic discovery of available streams and their properties.
+- **Discovery**: A feature of connectors that allows programmatic discovery of available streams and their properties.
 - **json_schema**: A vocabulary that allows you to annotate and validate JSON documents.
-- **create**: An operation that allows for the creation of new records.
+- **create**: Also known as insert. An operation that allows for the creation of new records.
 - **update**: An operation that allows for updating existing records.
 - **upsert**: An operation that updates a record if it exists, or creates a new record if it doesn't exist.
 - **delete**: An operation that removes existing records.
 - **row**: A schema representing the structure of data for read operations.
 - **insert**: A schema defining the structure for creating new records.
 - **relationships**: Information describing how streams are related to each other, including foreign key constraints and cardinality.
-- **id**: A unique identifier for a data stream, used for programmatic reference and to unambiguously identify streams across the system.
-- **name**: A human-readable name for a data stream, suitable for display in user interfaces or reports.
-- **operation_schemas**: Specific schemas for different operations (row, insert, update, upsert, delete) within a stream.
+- **Stream id**: A unique identifier for a data stream, used for programmatic reference and to unambiguously identify streams across the system.
+- **Stream name**: A human-readable name for a data stream, suitable for display in user interfaces or reports.
+- **Operation schemas**: Specific schemas for different operations (row, insert, update, upsert, delete) within a stream.
 - **discover**: Subcommand for invoking the discovery mode of a Snowpilot connector (e.g., `snowpilot discover`).
 - **extract**: Subcommand for running a Snowpilot connector in extract (source) mode (e.g., `snowpilot extract --config config.json --stream=<stream_id> --fields=id,email,name`).
 - **load**: Subcommand for running a Snowpilot connector in load (destination) mode (e.g., `snowpilot load --config config.json --stream=<stream_id> --operation=<operation_name> --fields=email,firstname,lastname`).
