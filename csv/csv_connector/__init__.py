@@ -5,6 +5,7 @@ Methods for the CSV connector.
 import os
 import csv
 import json
+import json_with_comments as jsonc
 import argparse
 import sys
 
@@ -105,9 +106,9 @@ def load(config, stream_id, operation, fields, data):
     return json.dumps({"success": True, "message": f"Data loaded into {stream_id} using {operation} operation"})
 
 def parse_config(config_path):
-    """Parse the configuration file."""
+    """Parse the configuration file (supports JSONC)."""
     with open(config_path, 'r') as config_file:
-        return json.load(config_file)
+        return jsonc.load(config_file)
 
 def main():
     parser = argparse.ArgumentParser(description="CSV Connector for Snowpilot")
