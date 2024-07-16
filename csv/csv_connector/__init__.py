@@ -5,7 +5,7 @@ Methods for the CSV connector.
 import os
 import csv
 import json
-import json_with_comments as jsonc
+import jsonc
 import argparse
 import sys
 
