@@ -1,5 +1,5 @@
 import argparse
-from csv_connector import discover, extract, load
+from csv_connector import discover, extract, load, parse_config
 
 def main():
     parser = argparse.ArgumentParser(description="CSV Connector for Snowpilot")
@@ -19,12 +19,14 @@ def main():
 
     args = parser.parse_args()
 
+    config = parse_config(args.config)
+
     if args.command == "discover":
-        discover(args.config)
+        discover(config)
     elif args.command == "extract":
-        extract(args.config)
+        extract(config)
     elif args.command == "load":
-        load(args.config)
+        load(config)
 
 if __name__ == "__main__":
     main()
