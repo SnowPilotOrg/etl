@@ -11,6 +11,7 @@ packages = [
 [tool.poetry.dependencies]
 python = "^3.10"
 pandas = "^2.2.2"
+json-with-comments = "^1.2.7"
 
 [tool.poetry.dev-dependencies]
 pytest = "^8.2.2"
@@ -21,3 +22,8 @@ pytest = "^8.2.2"
 [build-system]
 requires = ["poetry-core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"
+
+[tool.poetry.scripts]
+discover = "csv_connector:discover"
+extract = "csv_connector:extract"
+load = "csv_connector:load"
