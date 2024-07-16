@@ -43,6 +43,7 @@ def _infer_schema(file_path):
 
 def discover(config):
     """Discover available streams and their schemas."""
+    print(f"Discover function called with config: {config}")
     streams = []
     csv_path = config['csv_path']
 
@@ -57,6 +58,8 @@ def discover(config):
                     "name": stream_id,
                     "schema": schema
                 })
+                print(f"Processed file: {file_path}")
+                print(f"Generated schema: {json.dumps(schema, indent=2)}")
     elif os.path.isfile(csv_path) and csv_path.endswith('.csv'):
         stream_id = os.path.basename(csv_path)[:-4]  # Remove .csv extension
         schema = _infer_schema(csv_path)
@@ -65,9 +68,12 @@ def discover(config):
             "name": stream_id,
             "schema": schema
         })
+        print(f"Processed file: {csv_path}")
+        print(f"Generated schema: {json.dumps(schema, indent=2)}")
     else:
         raise ValueError(f"Invalid CSV path: {csv_path}")
 
+    print(f"Final streams data: {json.dumps(streams, indent=2)}")
     return json.dumps({"streams": streams}, indent=2)
 
 def extract(config, stream_id, fields):
