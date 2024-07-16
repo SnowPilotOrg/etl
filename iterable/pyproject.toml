@@ -5,6 +5,11 @@ description = "A simple Iterable connector following the Snowpilot Connector spe
 authors = ["SnowPilotOrg"]
 license = "MIT"
 
+[tool.poetry.scripts]
+discover = "iterable_connector:discover"
+extract = "iterable_connector:extract"
+load = "iterable_connector:load"
+
 [tool.poetry.dependencies]
 python = "^3.10"
 pandas = "^2.2.2"

@@ -5,14 +5,14 @@ Stub methods for the CSV connector.
 
 def discover():
     """Discover available streams and their schemas."""
-    pass
+    print("hello discover")
 
 
 def extract(stream_id, fields):
     """Extract data from the specified stream."""
-    pass
+    print("hello extract")
 
 
 def load(stream_id, operation, fields, data):
     """Load data into the specified stream."""
-    pass
+    print("hello load")
