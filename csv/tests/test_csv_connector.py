@@ -3,17 +3,83 @@ Comprehensive tests for the CSV connector methods.
 """
 
 import pytest
+import json
 from csv_connector import discover, extract, load
 
 def test_discover():
     """Test the discover method."""
     result = discover()
-    assert isinstance(result, list)
-    assert len(result) == 3
-    stream_names = [stream['stream_name'] for stream in result]
-    assert 'contacts' in stream_names
-    assert 'customers' in stream_names
-    assert 'orders' in stream_names
+    assert isinstance(result, str)
+
+    # Parse the JSON string
+    data = json.loads(result)
+
+    assert 'streams' in data
+    streams = data['streams']
+    assert len(streams) == 3
+
+    stream_ids = [stream['id'] for stream in streams]
+    assert 'contacts' in stream_ids
+    assert 'customers' in stream_ids
+    assert 'orders' in stream_ids
+
+    for stream in streams:
+        assert 'id' in stream
+        assert 'name' in stream
+        assert 'schema' in stream
+        assert stream['id'] == stream['name']
+        assert 'type' in stream['schema']
+        assert 'properties' in stream['schema']
+
+def test_discover_contacts_schema():
+    """Test the discover method for contacts schema."""
+    result = discover()
+    data = json.loads(result)
+
+    contacts_stream = next(stream for stream in data['streams'] if stream['id'] == 'contacts')
+    assert contacts_stream['schema']['type'] == 'object'
+    properties = contacts_stream['schema']['properties']
+    assert 'id' in properties
+    assert 'name' in properties
+    assert 'email' in properties
+    for prop in properties.values():
+        assert prop['type'] == 'string'
+
+def test_discover_customers_schema():
+    """Test the discover method for customers schema."""
+    result = discover()
+    data = json.loads(result)
+
+    customers_stream = next(stream for stream in data['streams'] if stream['id'] == 'customers')
+    assert customers_stream['schema']['type'] == 'object'
+    properties = customers_stream['schema']['properties']
+    assert 'customer_id' in properties
+    assert 'first_name' in properties
+    assert 'last_name' in properties
+    assert 'age' in properties
+    for prop, value in properties.items():
+        if prop == 'age':
+            assert value['type'] == 'integer'
+        else:
+            assert value['type'] == 'string'
+
+def test_discover_orders_schema():
+    """Test the discover method for orders schema."""
+    result = discover()
+    data = json.loads(result)
+
+    orders_stream = next(stream for stream in data['streams'] if stream['id'] == 'orders')
+    assert orders_stream['schema']['type'] == 'object'
+    properties = orders_stream['schema']['properties']
+    assert 'order_id' in properties
+    assert 'product_name' in properties
+    assert 'quantity' in properties
+    assert 'price' in properties
+    for prop, value in properties.items():
+        if prop in ['quantity', 'price']:
+            assert value['type'] == 'number'
+        else:
+            assert value['type'] == 'string'
 
 def test_extract_contacts():
     """Test the extract method for contacts."""
