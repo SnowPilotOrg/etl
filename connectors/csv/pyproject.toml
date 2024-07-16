@@ -10,6 +10,7 @@ python = "^3.10"
 pandas = "^2.2.2"
 json-with-comments = "^1.2.7"
 
+typer = "^0.12.3"
 [tool.poetry.dev-dependencies]
 pytest = "^8.2.2"
 
