@@ -11,10 +11,16 @@ import sys
 import jsonc
 
 
-def _infer_schema(file_path):
+def infer_schema(file_path, fields=None):
     with open(file_path, "r") as csvfile:
         headers = next(csv.reader(csvfile))
-        properties = {header: {"type": "string"} for header in headers}
+        selected_headers = (
+            headers
+            if fields is None
+            else [header for header in headers if header in fields]
+        )
+        properties = {header: {"type": "string"} for header in selected_headers}
+
     return {"type": "object", "properties": properties}
 
 
@@ -36,15 +42,18 @@ def discover(config):
         raise ValueError(f"Invalid CSV path: {csv_path}")
 
     for file_path in valid_csv_paths:
-        stream_id = os.path.basename(file_path)[:-4]  # Remove .csv extension
-        schema = _infer_schema(file_path)
-        streams.append({"id": stream_id, "name": stream_id, "schema": schema})
+        filename = os.path.basename(file_path)[:-4]  # Remove .csv extension
+        schema = infer_schema(file_path)
+        streams.append({"id": filename, "label": filename, "schema": schema})
 
-    return json.dumps({"streams": streams}, indent=2)
+    return print(json.dumps({"streams": streams}, indent=2))
 
 
 def extract(config, stream_id, fields):
     """Extract data from the specified stream."""
+    if not fields:
+        raise ValueError("Fields are required")
+
     csv_path = config["csv_path"]
     file_path = (
         os.path.join(csv_path, f"{stream_id}.csv")
@@ -55,17 +64,29 @@ def extract(config, stream_id, fields):
     if not os.path.isfile(file_path):
         raise ValueError(f"Invalid stream: {stream_id}")
 
+    schema_message = {
+        "type": "SCHEMA",
+        "stream": stream_id,
+        "schema": infer_schema(file_path, fields),
+    }
+
+    print(json.dumps(schema_message, indent=2))
+
     with open(file_path, "r") as csvfile:
         reader = csv.DictReader(csvfile)
-        data = []
         for row in reader:
-            if fields:
-                filtered_row = {field: row[field] for field in fields if field in row}
-                data.append(filtered_row)
-            else:
-                data.append(row)
+            if not fields:
+                break
 
-    return json.dumps(data, indent=2)
+            filtered_row = {field: row[field] for field in fields if field in row}
+            record_message = {
+                "type": "RECORD",
+                "stream": stream_id,
+                "record": filtered_row,
+            }
+            print(json.dumps(record_message, indent=2))
+
+    sys.stdout.flush()
 
 
 def load(config, stream_id, operation, fields, data):
@@ -112,14 +133,14 @@ def cli():
     # Extract subcommand
     extract_parser = subparsers.add_parser("extract", help="Extract data from a stream")
     extract_parser.add_argument(
-        "--stream-id", required=True, help="ID of the stream to extract"
+        "--stream", required=True, help="ID of the stream to extract"
     )
     extract_parser.add_argument("--fields", nargs="+", help="Fields to extract")
 
     # Load subcommand
     load_parser = subparsers.add_parser("load", help="Load data into a stream")
     load_parser.add_argument(
-        "--stream-id", required=True, help="ID of the stream to load data into"
+        "--stream", required=True, help="ID of the stream to load data into"
     )
     load_parser.add_argument(
         "--operation",
@@ -127,15 +148,19 @@ def cli():
         required=True,
         help="Operation to perform",
     )
-    load_parser.add_argument("--fields", nargs="+", help="Fields to load")
+    load_parser.add_argument(
+        "--fields",
+        nargs="+",
+        help="Fields to load",
+    )
 
     args = parser.parse_args()
     config = parse_config(args.config)
 
     if args.command == "discover":
-        print(discover(config))
+        discover(config)
     elif args.command == "extract":
-        print(extract(config, args.stream_id, args.fields))
+        extract(config, args.stream, args.fields)
     elif args.command == "load":
         data = json.loads(sys.stdin.read())
-        print(load(config, args.stream_id, args.operation, args.fields, data))
+        load(config, args.stream, args.operation, args.fields, data)
