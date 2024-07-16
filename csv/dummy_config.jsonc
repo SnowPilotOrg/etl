@@ -1,0 +1,4 @@
+{
+  // Dummy configuration for testing the discover function
+  "csv_path": "/path/to/csv/files"
+}
