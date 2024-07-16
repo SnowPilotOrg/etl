@@ -25,7 +25,6 @@ def infer_schema(file_path, fields=None):
 
 
 def discover(config):
-    """Discover available streams and their schemas."""
     streams = []
     csv_path = config["csv_path"]
 
@@ -50,7 +49,6 @@ def discover(config):
 
 
 def extract(config, stream_id, fields):
-    """Extract data from the specified stream."""
     if not fields:
         raise ValueError("Fields are required")
 
@@ -90,7 +88,6 @@ def extract(config, stream_id, fields):
 
 
 def load(config, stream_id, operation, fields, data):
-    """Load data into the specified stream."""
     valid_operations = ["upsert", "update", "create"]
     if operation not in valid_operations:
         raise ValueError(f"Invalid operation: {operation}")

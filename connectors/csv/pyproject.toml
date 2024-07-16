@@ -2,17 +2,19 @@
 name = "csv-connector"
 version = "0.1.0"
 description = "A simple CSV connector following the Snowpilot Connector specification"
-authors = ["SnowPilotOrg"]
+authors = ["Snowpilot, Inc. <developers@snowpilot.com>"]
 license = "MIT"
+readme = "README.md"
+packages = [{ include = "csv_connector" }]
+
+[tool.poetry.scripts]
+csv-connector = "csv_connector.main:app"
 
 [tool.poetry.dependencies]
 python = "^3.10"
 pandas = "^2.2.2"
 json-with-comments = "^1.2.7"
-
-typer = {extras = ["all"], version = "^0.12.3"}
-[tool.poetry.dev-dependencies]
-pytest = "^8.2.2"
+typer = { extras = ["all"], version = "^0.12.3" }
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^8.2.2"
@@ -20,6 +22,3 @@ pytest = "^8.2.2"
 [build-system]
 requires = ["poetry-core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"
-
-[tool.poetry.scripts]
-start = "csv_connector:start"
