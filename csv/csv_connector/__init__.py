@@ -15,10 +15,7 @@ def _infer_schema(file_path):
         properties = {}
         if file_name == 'contacts':
             for header in headers:
-                if header == 'id':
-                    properties[header] = {"type": "integer"}
-                else:
-                    properties[header] = {"type": "string"}
+                properties[header] = {"type": "string"}
         elif file_name == 'customers':
             for header in headers:
                 if header in ['customer_id', 'age']:
@@ -64,11 +61,19 @@ def discover():
 
 def extract(stream_id, fields):
     """Extract data from the specified stream."""
-    pass
+    valid_streams = ['contacts', 'customers', 'orders']
+    if stream_id not in valid_streams:
+        raise ValueError(f"Invalid stream: {stream_id}")
+    # Placeholder implementation
+    return [{'field': 'value'} for _ in range(3)]
 
 def load(stream_id, operation, fields, data):
     """Load data into the specified stream."""
-    pass
+    valid_operations = ['upsert']
+    if operation not in valid_operations:
+        raise ValueError(f"Invalid operation: {operation}")
+    # Placeholder implementation
+    return True
 
 if __name__ == "__main__":
     print(discover())
