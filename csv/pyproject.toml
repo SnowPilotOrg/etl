@@ -4,9 +4,6 @@ version = "0.1.0"
 description = "A simple CSV connector following the Snowpilot Connector specification"
 authors = ["SnowPilotOrg"]
 license = "MIT"
-packages = [
-    { include = "csv_connector" }
-]
 
 [tool.poetry.dependencies]
 python = "^3.10"
@@ -24,6 +21,4 @@ requires = ["poetry-core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"
 
 [tool.poetry.scripts]
-discover = "csv_connector:discover"
-extract = "csv_connector:extract"
-load = "csv_connector:load"
+csv_connector = "csv_connector:cli"
