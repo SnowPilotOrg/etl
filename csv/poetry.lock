@@ -37,6 +37,17 @@ files = [
 ]
 
 [[package]]
+name = "json-with-comments"
+version = "1.2.7"
+description = "JSON with Comments (jsonc) for Python"
+optional = false
+python-versions = ">=3.7"
+files = [
+    {file = "json_with_comments-1.2.7-py3-none-any.whl", hash = "sha256:dee00264b23d44910af4f349f38d903fa196bf00c5e1611bbb009077d99349cd"},
+    {file = "json_with_comments-1.2.7.tar.gz", hash = "sha256:68b3b2eaf776b8d5f3c8ccd71ce79ae52a221c02bee4b97b9d61fadc426cb2e4"},
+]
+
+[[package]]
 name = "numpy"
 version = "2.0.0"
 description = "Fundamental package for array computing in Python"
@@ -272,4 +283,4 @@ files = [
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.10"
-content-hash = "d48428e1aa01920d10966264ce0d64452127342ed5df518e350738c529936bf9"
+content-hash = "3cedb5ba9ef28b39275cd9a293d306ed039915ecf78803b0d128887a41e2eb66"

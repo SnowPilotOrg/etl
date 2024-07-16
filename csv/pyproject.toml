@@ -8,10 +8,17 @@ license = "MIT"
 [tool.poetry.dependencies]
 python = "^3.10"
 pandas = "^2.2.2"
+json-with-comments = "^1.2.7"
 
 [tool.poetry.dev-dependencies]
+pytest = "^8.2.2"
+
+[tool.poetry.group.dev.dependencies]
 pytest = "^8.2.2"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"
+
+[tool.poetry.scripts]
+cli = "csv_connector:cli"
