@@ -9,7 +9,7 @@ import json
 def discover():
     """Discover available streams and their schemas."""
     streams = []
-    csv_dir = os.path.join(os.path.dirname(__file__), 'tests')
+    csv_dir = os.path.join(os.path.dirname(__file__), '..', 'tests')
 
     for filename in os.listdir(csv_dir):
         if filename.endswith('.csv'):
