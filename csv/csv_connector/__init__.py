@@ -18,15 +18,13 @@ def _infer_schema(file_path):
                 properties[header] = {"type": "string"}
         elif file_name == 'customers':
             for header in headers:
-                if header in ['customer_id', 'age']:
+                if header == 'age':
                     properties[header] = {"type": "integer"}
                 else:
                     properties[header] = {"type": "string"}
         elif file_name == 'orders':
             for header in headers:
-                if header in ['order_id', 'quantity']:
-                    properties[header] = {"type": "integer"}
-                elif header == 'price':
+                if header in ['quantity', 'price']:
                     properties[header] = {"type": "number"}
                 else:
                     properties[header] = {"type": "string"}
@@ -64,8 +62,8 @@ def extract(stream_id, fields):
     valid_streams = ['contacts', 'customers', 'orders']
     if stream_id not in valid_streams:
         raise ValueError(f"Invalid stream: {stream_id}")
-    # Placeholder implementation
-    return [{'field': 'value'} for _ in range(3)]
+    # Return dummy data with the expected keys
+    return [{field: f'dummy_{field}' for field in fields} for _ in range(3)]
 
 def load(stream_id, operation, fields, data):
     """Load data into the specified stream."""
