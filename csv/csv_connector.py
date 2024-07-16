@@ -12,60 +12,34 @@ import jsonc
 
 
 def _infer_schema(file_path):
-    file_name = os.path.basename(file_path).split(".")[0]
     with open(file_path, "r") as csvfile:
-        reader = csv.reader(csvfile)
-        headers = next(reader)
-
-        properties = {}
-        if file_name == "contacts":
-            for header in headers:
-                properties[header] = {"type": "string"}
-        elif file_name == "customers":
-            for header in headers:
-                if header == "age":
-                    properties[header] = {"type": "integer"}
-                else:
-                    properties[header] = {"type": "string"}
-        elif file_name == "orders":
-            for header in headers:
-                if header in ["quantity", "price"]:
-                    properties[header] = {"type": "number"}
-                else:
-                    properties[header] = {"type": "string"}
-        else:
-            # Default behavior for unknown files
-            for header in headers:
-                properties[header] = {"type": "string"}
-
-        return {"type": "object", "properties": properties}
+        headers = next(csv.reader(csvfile))
+        properties = {header: {"type": "string"} for header in headers}
+    return {"type": "object", "properties": properties}
 
 
 def discover(config):
     """Discover available streams and their schemas."""
-    print(f"Discover function called with config: {config}")
     streams = []
     csv_path = config["csv_path"]
 
+    valid_csv_paths = []
     if os.path.isdir(csv_path):
-        for filename in os.listdir(csv_path):
-            if filename.endswith(".csv"):
-                file_path = os.path.join(csv_path, filename)
-                stream_id = filename[:-4]  # Remove .csv extension
-                schema = _infer_schema(file_path)
-                streams.append({"id": stream_id, "name": stream_id, "schema": schema})
-                print(f"Processed file: {file_path}")
-                print(f"Generated schema: {json.dumps(schema, indent=2)}")
+        valid_csv_paths = [
+            os.path.join(csv_path, filename)
+            for filename in os.listdir(csv_path)
+            if filename.endswith(".csv")
+        ]
     elif os.path.isfile(csv_path) and csv_path.endswith(".csv"):
-        stream_id = os.path.basename(csv_path)[:-4]  # Remove .csv extension
-        schema = _infer_schema(csv_path)
-        streams.append({"id": stream_id, "name": stream_id, "schema": schema})
-        print(f"Processed file: {csv_path}")
-        print(f"Generated schema: {json.dumps(schema, indent=2)}")
+        valid_csv_paths = [csv_path]
     else:
         raise ValueError(f"Invalid CSV path: {csv_path}")
 
-    print(f"Final streams data: {json.dumps(streams, indent=2)}")
+    for file_path in valid_csv_paths:
+        stream_id = os.path.basename(file_path)[:-4]  # Remove .csv extension
+        schema = _infer_schema(file_path)
+        streams.append({"id": stream_id, "name": stream_id, "schema": schema})
+
     return json.dumps({"streams": streams}, indent=2)
 
 
