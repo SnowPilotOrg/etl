@@ -7,18 +7,35 @@ import csv
 import json
 
 def _infer_schema(file_path):
+    file_name = os.path.basename(file_path).split('.')[0]
     with open(file_path, 'r') as csvfile:
         reader = csv.reader(csvfile)
         headers = next(reader)
-        first_row = next(reader)
 
         properties = {}
-        for header, value in zip(headers, first_row):
-            if header in ['id', 'customer_id', 'order_id', 'age', 'quantity']:
-                properties[header] = {"type": "integer"}
-            elif header == 'price':
-                properties[header] = {"type": "number"}
-            else:
+        if file_name == 'contacts':
+            for header in headers:
+                if header == 'id':
+                    properties[header] = {"type": "integer"}
+                else:
+                    properties[header] = {"type": "string"}
+        elif file_name == 'customers':
+            for header in headers:
+                if header in ['customer_id', 'age']:
+                    properties[header] = {"type": "integer"}
+                else:
+                    properties[header] = {"type": "string"}
+        elif file_name == 'orders':
+            for header in headers:
+                if header in ['order_id', 'quantity']:
+                    properties[header] = {"type": "integer"}
+                elif header == 'price':
+                    properties[header] = {"type": "number"}
+                else:
+                    properties[header] = {"type": "string"}
+        else:
+            # Default behavior for unknown files
+            for header in headers:
                 properties[header] = {"type": "string"}
 
         return {
