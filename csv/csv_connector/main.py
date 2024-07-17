@@ -42,7 +42,7 @@ def infer_schema(csv_path: str, collection_id: str) -> Schema:
 def config(
     config_file: Annotated[
         typer.FileText,
-        typer.Option("--config", "-c", help="Path to the configuration file"),
+        typer.Option("--config", "-f", help="Path to the configuration file"),
     ],
 ):
     """Provide the path to the configuration file."""

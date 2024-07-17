@@ -32,7 +32,7 @@ state: Dict[str, Optional[Config]] = {"config": None}
 def config(
     config_file: Annotated[
         typer.FileText,
-        typer.Option("--config", "-c", help="Path to the configuration file"),
+        typer.Option("--config", "-f", help="Path to the configuration file"),
     ],
 ):
     """Provide the path to the configuration file."""
@@ -68,8 +68,8 @@ def extract():
 
 @app.command()
 def load(
-    collection_id: Annotated[str, typer.Option("--collection")],
-    operation: Annotated[str, typer.Option("--operation")],
+    collection_id: Annotated[str, typer.Option("--collection", "-c")],
+    operation: Annotated[str, typer.Option("--operation", "-o")],
 ):
     """Load data into the specified collection."""
     # TODO: support collections other than users, and list which ones are valid
