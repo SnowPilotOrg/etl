@@ -1,10 +1,15 @@
+from typing import Optional
+
 import typer
+from typing_extensions import Annotated
 
 app = typer.Typer()
 
 
 @app.command()
-def discover():
+def discover(
+    config: Annotated[str, typer.Option(help="Path to the configuration file")],
+):
     """Discover available streams and their schemas."""
     typer.echo("Discovering available streams and their schemas")
 

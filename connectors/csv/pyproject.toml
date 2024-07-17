@@ -8,7 +8,7 @@ readme = "README.md"
 packages = [{ include = "csv_connector" }]
 
 [tool.poetry.scripts]
-csv-connector = "csv_connector.main:app"
+csv-con = "csv_connector.main:app"
 
 [tool.poetry.dependencies]
 python = "^3.10"
