@@ -25,9 +25,11 @@ def discover(
 def extract():
     """Extract data from the specified stream."""
     err_console.print("Extract is not implemented yet")
+    raise typer.Exit(code=1)
 
 
 @app.command()
 def load():
     """Load data into the specified stream."""
     err_console.print("Load is not implemented yet")
+    raise typer.Exit(code=1)
