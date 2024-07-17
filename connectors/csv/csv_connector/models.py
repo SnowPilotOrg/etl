@@ -1,12 +1,18 @@
 import json
 from typing import Any, Dict, Optional, Type
 
-from pydantic import BaseModel, field_serializer
+from pydantic import BaseModel, field_serializer, field_validator
 from typing_extensions import Literal
 
 
 class Config(BaseModel):
     csv_path: str
+
+    @field_validator("csv_path")
+    def validate_csv_extension(cls, v):
+        if not v.lower().endswith(".csv"):
+            raise ValueError("csv_path must end with .csv")
+        return v
 
 
 # TODO: types below are not specific to CSV, but are used for all connectors
