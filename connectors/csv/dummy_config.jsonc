@@ -1,4 +1,0 @@
-{
-  // Dummy configuration for testing the discover function
-  "csv_path": "/home/ubuntu/connectors/csv/test_data"
-}
