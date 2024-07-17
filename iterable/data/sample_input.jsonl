@@ -1,0 +1,2 @@
+{ "userId": "user_123", "email": "user123@example.com", "dataFields": { "my_custom_field": "foo" } }
+{ "userId": "user_124", "email": "user124@example.com", "dataFields": { "my_custom_field": "bar" } }

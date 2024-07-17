@@ -67,6 +67,55 @@ def extract():
 
 
 @app.command()
-def load():
+def load(
+    collection_id: Annotated[str, typer.Option("--collection")],
+    operation: Annotated[str, typer.Option("--operation")],
+):
     """Load data into the specified collection."""
-    raise NotImplementedError("Not implemented")
+    # TODO: support collections other than users, and list which ones are valid
+    if collection_id not in ["users"]:
+        raise typer.BadArgument("Unsupported collection ID")
+
+    # TODO: support other operations, and list the valid ones
+    if operation not in ["upsert"]:
+        raise typer.BadArgument("Unsupported operation")
+
+    records: list[Dict] = []
+
+    # Read JSONL from stdin
+    # TODO: we should do this in a streaming fashion
+    for line in sys.stdin:
+        try:
+            record = json.loads(line.strip())
+            records.append(record)
+        except json.JSONDecodeError:
+            err_console.print(
+                f"[bold yellow]Warning: Skipping invalid JSON line: {line.strip()}[/bold yellow]"
+            )
+
+    if not records:
+        err_console.print(
+            "[bold yellow]Warning: No valid records found in input.[/bold yellow]"
+        )
+        return
+
+        # TODO: rate-limiting & size-limiting
+        # TODO: error handling
+
+    # https://api.iterable.com/api/docs#users_bulkUpdateUser
+    body = {
+        "users": [
+            {**record, "preferUserId": True, "mergeNestedObjects": True}
+            for record in records
+        ]
+    }
+    response = httpx.post(
+        "https://api.iterable.com/api/users/bulkUpdate",
+        headers={"Api-Key": state["config"].api_key},
+        json=body,
+    )
+    print(response.json())
+
+    print(
+        f"[green]Successfully loaded {len(records)} records into {collection_id}[/green]"
+    )
