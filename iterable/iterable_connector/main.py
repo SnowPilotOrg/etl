@@ -1,9 +1,10 @@
-import csv
+import asyncio
 import json
 import os
 import sys
 from typing import Dict, Optional
 
+import httpx
 import jsonc
 import typer
 from pydantic import ValidationError, create_model
@@ -11,11 +12,12 @@ from rich import print
 from rich.console import Console
 from typing_extensions import Annotated
 
-from csv_connector.models import (
+from iterable_connector.models import (
+    Catalog,
     CollectionMetadata,
     Config,
-    Discovery,
     Schema,
+    User,
 )
 
 err_console = Console(stderr=True)
@@ -47,14 +49,21 @@ def config(
 @app.command()
 def discover():
     """Discover available collections and their schemas."""
-    raise NotImplementedError("Not implemented")
+    catalog = Catalog(
+        collections=[CollectionMetadata(id="users", label="Users", upsert=User)]
+    )
+    print(catalog.model_dump_json(indent=2))
 
 
 @app.command()
 def extract():
     """Extract data from the specified collection."""
-    raise NotImplementedError("Not implemented")
-
+    response = httpx.get(
+        "https://api.iterable.com/api/export/data.json",
+        params={"dataTypeName": "user", "range": "All"},
+        headers={"Api-Key": state["config"].api_key},
+    )
+    print(response.text.strip())
 
 
 @app.command()

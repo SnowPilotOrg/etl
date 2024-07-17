@@ -1,9 +1,8 @@
 """
-Comprehensive tests for the CSV connector methods.
+Comprehensive tests for the Iterable connector methods.
 """
 
 import pytest
-from connectors.iterable.temp import discover, extract, load
 
 
 def test_discover():
@@ -11,8 +10,8 @@ def test_discover():
     raise NotImplementedError("Test not implemented")
 
 
-def test_extract_contacts():
-    """Test the extract method for contacts."""
+def test_extract_users():
+    """Test the extract method for users."""
     raise NotImplementedError("Test not implemented")
 
 
