@@ -1,7 +1,6 @@
-import asyncio
 import json
-import os
 import sys
+from datetime import datetime
 from typing import Dict, Optional
 
 import httpx
@@ -39,11 +38,51 @@ def build_client(config: Config):
     )
 
 
+def api_type_to_pydantic_type(type: str) -> type:
+    match type:
+        case "string":
+            return str
+        case "long":
+            return int
+        case "boolean":
+            return bool
+        case "date":
+            return datetime
+        case "object":
+            return dict
+        case _:
+            raise ValueError(f"Unsupported type: {type}")
+
+
 def get_user_schema(config: Config) -> Schema:
     with build_client(config) as client:
         response = client.get("users/getFields")
         response.raise_for_status()
-        # return Schema(**response.json())
+
+        # Example response
+        # {
+        #  "fields": {
+        #     "devices.appBuild": "string",
+        #     "my_custom_field": "string",
+        #     "phoneNumberDetails.carrier": "string",
+        #     "phoneNumber": "string",
+        #     "email": "string",
+        #     ...
+        #   }
+        # }
+
+        response_body = response.json()
+        fields = response_body["fields"]
+
+        schema = create_model(
+            "user_schema",
+            **{
+                field: (api_type_to_pydantic_type(type), ...)
+                # TODO: these aren't all required. Fix the pydantic model
+                for (field, type) in fields.items()
+            },
+        )
+        return schema
 
 
 @app.callback()
@@ -67,8 +106,13 @@ def config(
 @app.command()
 def discover():
     """Discover available collections and their schemas."""
+    user_schema = get_user_schema(state["config"])
     catalog = Catalog(
-        collections=[CollectionMetadata(id="users", label="Users", upsert=User)]
+        collections=[
+            CollectionMetadata(
+                id="users", label="Users", row=user_schema, upsert=User
+            )  # TODO: we should enforce the types of custom fields on upsert
+        ]
     )
     print(catalog.model_dump_json(indent=2))
 
