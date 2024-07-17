@@ -4,3 +4,4 @@ __pycache__/
 .venv/
 .mypy_cache/
 dist/
+*config.json*
