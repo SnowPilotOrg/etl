@@ -28,6 +28,24 @@ state: Dict[str, Optional[Config]] = {"config": None}
 # OPEN Q: Should we have a `meta` command to get the schema of the config file?
 
 
+def build_client(config: Config):
+    return httpx.Client(
+        # NOTE: base_url will have to be dynamic when we support eu-region accounts
+        base_url="https://api.iterable.com/api/",
+        headers={
+            "Api-Key": config.api_key,
+            "User-Agent": "Snowpilot/1.0 (developers@snowpilot.com)",
+        },
+    )
+
+
+def get_user_schema(config: Config) -> Schema:
+    with build_client(config) as client:
+        response = client.get("users/getFields")
+        response.raise_for_status()
+        # return Schema(**response.json())
+
+
 @app.callback()
 def config(
     config_file: Annotated[
@@ -56,14 +74,18 @@ def discover():
 
 
 @app.command()
-def extract():
+def extract(collection_id: Annotated[str, typer.Option("--collection", "-c")]):
     """Extract data from the specified collection."""
-    response = httpx.get(
-        "https://api.iterable.com/api/export/data.json",
-        params={"dataTypeName": "user", "range": "All"},
-        headers={"Api-Key": state["config"].api_key},
-    )
-    print(response.text.strip())
+    if collection_id not in ["users"]:
+        raise typer.BadArgument("Unsupported collection ID")
+
+    with build_client(state["config"]) as client:
+        response = client.get(
+            "export/data.json",
+            params={"dataTypeName": "user", "range": "All"},
+        )
+        response.raise_for_status()
+        print(response.text.strip())
 
 
 @app.command()
@@ -109,12 +131,14 @@ def load(
             for record in records
         ]
     }
-    response = httpx.post(
-        "https://api.iterable.com/api/users/bulkUpdate",
-        headers={"Api-Key": state["config"].api_key},
-        json=body,
-    )
-    print(response.json())
+
+    with build_client(state["config"]) as client:
+        response = client.post(
+            "users/bulkUpdate",
+            json=body,
+        )
+        response.raise_for_status()
+        print(response.json())
 
     print(
         f"[green]Successfully loaded {len(records)} records into {collection_id}[/green]"
