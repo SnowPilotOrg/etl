@@ -5,10 +5,10 @@ description = "An Iterable connector conforming to the Snowpilot Connector speci
 authors = ["Snowpilot, Inc. <developers@snowpilot.com>"]
 license = "MIT"
 readme = "README.md"
-packages = [{ include = "iterable_connector" }]
+packages = [{ include = "src" }]
 
 [tool.poetry.scripts]
-iterable-con = "iterable_connector.main:app"
+iterable = "src.main:app"
 
 [tool.poetry.dependencies]
 python = "^3.10"
