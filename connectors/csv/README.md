@@ -27,7 +27,7 @@ Create a JSON or JSONC (JSON with Comments) configuration file (e.g., `config.js
 
 ### Discover Command
 
-To list available streams and their schemas:
+To list available collections and their schemas:
 
 ```
 python -m csv_connector discover --config config.json
@@ -35,7 +35,7 @@ python -m csv_connector discover --config config.json
 
 ### Extract Command
 
-To extract data from a specific stream:
+To extract data from a specific collection:
 
 ```
 python -m csv_connector extract --config config.json
@@ -43,7 +43,7 @@ python -m csv_connector extract --config config.json
 
 ### Load Command
 
-To load data into a specific stream:
+To load data into a specific collection:
 
 ```
 python -m csv_connector load --config config.json
@@ -67,11 +67,13 @@ This project uses Poetry for dependency management and packaging. Poetry scripts
 You can now use the following Poetry scripts to run the CSV connector commands:
 
 1. Discover Command:
+
    ```
    poetry run discover --config config.json
    ```
 
 2. Extract Command:
+
    ```
    poetry run extract --config config.json
    ```
@@ -87,17 +89,19 @@ Note: The configuration file now supports JSONC (JSON with Comments) format.
 
 ## Examples
 
-1. Discover available streams:
+1. Discover available collections:
+
    ```
    poetry run discover --config /path/to/config.json
    ```
 
-2. Extract data from a stream:
+2. Extract data from a collection:
+
    ```
    poetry run extract --config /path/to/config.json
    ```
 
-3. Load data into a stream:
+3. Load data into a collection:
    ```
    poetry run load --config /path/to/config.json
    ```
@@ -109,16 +113,19 @@ Note: Make sure to replace `/path/to/config.json` with the actual path to your c
 To run the tests for this CSV connector, follow these steps:
 
 1. Ensure you have Poetry installed. If not, install it using:
+
    ```
    curl -sSL https://install.python-poetry.org | python3 -
    ```
 
 2. Navigate to the CSV connector directory:
+
    ```
    cd connectors/csv
    ```
 
 3. Install the project dependencies using Poetry:
+
    ```
    poetry install
    ```

@@ -16,6 +16,7 @@ pandas = "^2.2.2"
 json-with-comments = "^1.2.7"
 typer = { extras = ["all"], version = "^0.12.3" }
 jsonschema = "^4.23.0"
+pydantic = "^2.8.2"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^8.2.2"
