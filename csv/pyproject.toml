@@ -5,10 +5,10 @@ description = "A simple CSV connector conforming to the Snowpilot Connector spec
 authors = ["Snowpilot, Inc. <developers@snowpilot.com>"]
 license = "MIT"
 readme = "README.md"
-packages = [{ include = "csv_connector" }]
+packages = [{ include = "src" }]
 
 [tool.poetry.scripts]
-csv-con = "csv_connector.main:app"
+csv = "src.main:app"
 
 [tool.poetry.dependencies]
 python = "^3.10"

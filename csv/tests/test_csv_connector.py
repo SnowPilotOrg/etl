@@ -6,7 +6,7 @@ import json
 
 import pytest
 
-from csv_connector import discover, extract, load
+from src import discover, extract, load
 
 
 def test_discover():
