@@ -1,21 +1,24 @@
 [tool.poetry]
 name = "iterable-connector"
 version = "0.1.0"
-description = "A simple Iterable connector following the Snowpilot Connector specification"
-authors = ["SnowPilotOrg"]
+description = "An Iterable connector conforming to the Snowpilot Connector specification"
+authors = ["Snowpilot, Inc. <developers@snowpilot.com>"]
 license = "MIT"
+readme = "README.md"
+packages = [{ include = "iterable_connector" }]
 
 [tool.poetry.scripts]
-discover = "iterable_connector:discover"
-extract = "iterable_connector:extract"
-load = "iterable_connector:load"
+iterable-con = "iterable_connector.main:app"
 
 [tool.poetry.dependencies]
 python = "^3.10"
 pandas = "^2.2.2"
-httpx = "^0.27.0"
+json-with-comments = "^1.2.7"
+typer = { extras = ["all"], version = "^0.12.3" }
+jsonschema = "^4.23.0"
+pydantic = "^2.8.2"
 
-[tool.poetry.dev-dependencies]
+[tool.poetry.group.dev.dependencies]
 pytest = "^8.2.2"
 
 [build-system]

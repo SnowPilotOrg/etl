@@ -3,7 +3,7 @@ Comprehensive tests for the CSV connector methods.
 """
 
 import pytest
-from iterable_connector import discover, extract, load
+from connectors.iterable.temp import discover, extract, load
 
 
 def test_discover():
