@@ -5,10 +5,10 @@ description = "An Snowflake connector conforming to the Snowpilot Connector spec
 authors = ["Snowpilot, Inc. <developers@snowpilot.com>"]
 license = "MIT"
 readme = "README.md"
-packages = [{ include = "snowflake_connector" }]
+packages = [{ include = "snowflake" }]
 
 [tool.poetry.scripts]
-snowflake-con = "snowflake_connector.main:app"
+snowflake = "snowflake.main:app"
 
 [tool.poetry.dependencies]
 python = "^3.10"

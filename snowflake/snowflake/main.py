@@ -11,7 +11,7 @@ from rich import print
 from rich.console import Console
 from typing_extensions import Annotated
 
-from snowflake_connector.models import (
+from snowflake.models import (
     Catalog,
     CollectionMetadata,
     Config,
