@@ -1,0 +1,27 @@
+[tool.poetry]
+name = "snowflake-connector"
+version = "0.1.0"
+description = "An Snowflake connector conforming to the Snowpilot Connector specification"
+authors = ["Snowpilot, Inc. <developers@snowpilot.com>"]
+license = "MIT"
+readme = "README.md"
+packages = [{ include = "snowflake_connector" }]
+
+[tool.poetry.scripts]
+snowflake-con = "snowflake_connector.main:app"
+
+[tool.poetry.dependencies]
+python = "^3.10"
+pandas = "^2.2.2"
+json-with-comments = "^1.2.7"
+typer = { extras = ["all"], version = "^0.12.3" }
+jsonschema = "^4.23.0"
+pydantic = "^2.8.2"
+httpx = "^0.27.0"
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^8.2.2"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
