@@ -15,13 +15,13 @@
 
 ## Introduction
 
-The Snowpilot Connector Specification defines a standardized method for discovering available data streams, performing full data extraction, and loading data into destinations. This document outlines the requirements and interface for Snowpilot connectors, focusing on manual selection of data streams and full extraction processes. It provides guidelines for implementing connectors that can efficiently discover, extract, and load data in various scenarios.
+The Snowpilot Connector Specification defines a standardized method for discovering available data collections, performing full data extraction, and loading data into destinations. This document outlines the requirements and interface for Snowpilot connectors, focusing on manual selection of data collections and full extraction processes. It provides guidelines for implementing connectors that can efficiently discover, extract, and load data in various scenarios.
 
-This specification is inspired by the Singer project but is an independent and incompatible standard. It aims to provide a flexible and efficient way to programmatically retrieve metadata about available streams, extract data, and load data into destinations, without the need to run separate extractor and loader processes.
+This specification is inspired by the Singer project but is an independent and incompatible standard. It aims to provide a flexible and efficient way to programmatically retrieve metadata about available collections, extract data, and load data into destinations, without the need to run separate extractor and loader processes.
 
 Connectors are designed to operate in three modes based on the provided command-line arguments:
 
-1. `discover`: Outputs metadata describing the streams and relationships it knows about.
+1. `discover`: Outputs metadata describing the collections and relationships it knows about.
 2. `extract`: Acts as an extractor, producing schema and record messages.
 3. `load --operation=[OPERATION]`: Acts as a loader, consuming schema and record messages, performing operations based on the specified `[OPERATION]` argument (create, update, upsert, or delete).
 
@@ -38,37 +38,37 @@ Discovery mode is invoked using the `discover` command:
 Here's a concrete example:
 `snowpilot discover --config=config.json`
 
-In this mode, the connector outputs metadata about streams and relationships it knows about, including schemas for create, update, upsert, and delete operations.
+In this mode, the connector outputs metadata about collections and relationships it knows about, including schemas for create, update, upsert, and delete operations.
 
 ### Extract Mode
 
 Extract mode is invoked using the `extract` command:
 
-`snowpilot extract --config=config.json --stream=<stream_id> --fields=<fields>`
+`snowpilot extract --config=config.json --collection=<collection_id> --fields=<fields>`
 
 Here's a concrete example:
-`snowpilot extract --config=config.json --stream=users --fields=id,name,email`
+`snowpilot extract --config=config.json --collection=users --fields=id,name,email`
 
-In this mode, the connector acts as an extractor, producing schema and record messages. The `--stream` flag specifies the stream ID to extract from, and the `--fields` flag allows for a comma-separated list of fields to extract.
+In this mode, the connector acts as an extractor, producing schema and record messages. The `--collection` flag specifies the collection ID to extract from, and the `--fields` flag allows for a comma-separated list of fields to extract.
 
 ### Load Mode
 
-Load mode is invoked using the `load` command-line argument along with `--stream`, `--operation`, and `--fields` arguments:
+Load mode is invoked using the `load` command-line argument along with `--collection`, `--operation`, and `--fields` arguments:
 
-`snowpilot load --config=<config_file_path> --stream=<stream_id> --operation=<operation_name> --fields=<fields>`
+`snowpilot load --config=<config_file_path> --collection=<collection_id> --operation=<operation_name> --fields=<fields>`
 
 Here's a concrete example:
-`snowpilot load --config=config.json --stream=users --operation=upsert --fields=id,name,email`
+`snowpilot load --config=config.json --collection=users --operation=upsert --fields=id,name,email`
 
-In this mode, the connector acts as a loader, consuming schema and record messages. It performs operations based on the specified `<operation_name>` argument (e.g., insert, update, upsert) for the specified `<stream_id>`, focusing on the fields listed in the `--fields` argument.
+In this mode, the connector acts as a loader, consuming schema and record messages. It performs operations based on the specified `<operation_name>` argument (e.g., insert, update, upsert) for the specified `<collection_id>`, focusing on the fields listed in the `--fields` argument.
 
 ## JSON Output Format
 
-The JSON output for the discovery mode follows the Snowpilot Connector format, which includes schemas of available streams, their properties, and separate schemas for different operations. An example of the output is as follows:
+The JSON output for the discovery mode follows the Snowpilot Connector format, which includes schemas of available collections, their properties, and separate schemas for different operations. An example of the output is as follows:
 
 ```json
 {
-  "streams": [
+  "collections": [
     {
       "id": "users",
       "name": "Users",
@@ -91,9 +91,7 @@ The JSON output for the discovery mode follows the Snowpilot Connector format, w
               "format": "date-time"
             }
           },
-          "required": [
-            "id"
-          ]
+          "required": ["id"]
         },
         "insert": {
           "type": "object",
@@ -106,10 +104,7 @@ The JSON output for the discovery mode follows the Snowpilot Connector format, w
               "format": "email"
             }
           },
-          "required": [
-            "name",
-            "email"
-          ]
+          "required": ["name", "email"]
         },
         "update": {
           "type": "object",
@@ -125,9 +120,7 @@ The JSON output for the discovery mode follows the Snowpilot Connector format, w
               "format": "email"
             }
           },
-          "required": [
-            "id"
-          ]
+          "required": ["id"]
         },
         "upsert": {
           "type": "object",
@@ -143,10 +136,7 @@ The JSON output for the discovery mode follows the Snowpilot Connector format, w
               "format": "email"
             }
           },
-          "required": [
-            "name",
-            "email"
-          ]
+          "required": ["name", "email"]
         },
         "delete": {
           "type": "object",
@@ -155,22 +145,16 @@ The JSON output for the discovery mode follows the Snowpilot Connector format, w
               "type": "integer"
             }
           },
-          "required": [
-            "id"
-          ]
+          "required": ["id"]
         }
       },
       "relationships": [
         {
           "foreign_key_name": "user_orders",
-          "columns": [
-            "id"
-          ],
+          "columns": ["id"],
           "is_one_to_one": false,
-          "referenced_stream": "orders",
-          "referenced_columns": [
-            "user_id"
-          ]
+          "referenced_collection": "orders",
+          "referenced_columns": ["user_id"]
         }
       ]
     }
@@ -182,10 +166,10 @@ Snowpilot Connectors operate in three distinct modes, each invoked by a specific
 
 ### 1. Discovery Mode
 
-When invoked with the `discover` command, the connector outputs metadata describing the streams and relationships it knows about. This includes:
+When invoked with the `discover` command, the connector outputs metadata describing the collections and relationships it knows about. This includes:
 
 - Schemas for row, insert, update, upsert, and delete operations
-- Relationships between streams
+- Relationships between collections
 
 Example usage:
 
@@ -203,10 +187,10 @@ In extract mode, the connector acts as a data source, performing full extraction
 Example usage:
 
 ```shell
-snowpilot extract --config config.json --stream=<stream_id> --fields=id,email,name
+snowpilot extract --config config.json --collection=<collection_id> --fields=id,email,name
 ```
 
-The `--stream` flag specifies the stream ID to extract from, and the `--fields` flag provides a comma-separated list of fields to extract.
+The `--collection` flag specifies the collection ID to extract from, and the `--fields` flag provides a comma-separated list of fields to extract.
 
 ### 3. Load Mode
 
@@ -220,14 +204,14 @@ It then performs the specified operation (insert, update, upsert, or delete) bas
 Example usage:
 
 ```shell
-snowpilot load --config config.json --stream=<stream_id> --operation=<operation_name> --fields=email,firstname,lastname
+snowpilot load --config config.json --collection=<collection_id> --operation=<operation_name> --fields=email,firstname,lastname
 ```
 
-The `--stream` flag specifies the stream ID to load to, `--operation` specifies the operation type (e.g., insert, update, upsert), and `--fields` provides a comma-separated list of fields to load.
+The `--collection` flag specifies the collection ID to load to, `--operation` specifies the operation type (e.g., insert, update, upsert), and `--fields` provides a comma-separated list of fields to load.
 
 ### Supported Operations and Schema Structure
 
-The discovery output includes separate schemas for different operations within the `schema` object. This information helps in determining the appropriate sync behavior and data structure for each stream. The following operation-specific schemas are used:
+The discovery output includes separate schemas for different operations within the `schema` object. This information helps in determining the appropriate sync behavior and data structure for each collection. The following operation-specific schemas are used:
 
 - `row`: Schema for read operations, representing the full structure of a record.
 - `insert`: Schema for create operations, specifying fields required or allowed when creating new records.
@@ -235,7 +219,7 @@ The discovery output includes separate schemas for different operations within t
 - `upsert`: Schema combining insert and update operations, used for upserting records.
 - `delete`: Schema for delete operations, typically containing key fields to identify records for deletion.
 
-The presence of these operation-specific schemas implies support for the corresponding operations. For example, if an `insert` schema is provided for a stream, it indicates that the stream supports creating new records.
+The presence of these operation-specific schemas implies support for the corresponding operations. For example, if an `insert` schema is provided for a collection, it indicates that the collection supports creating new records.
 
 These operation-specific schemas allow for fine-grained control over the sync process, enabling the distinction between different operation types and their corresponding data structures. By providing separate schemas for each operation, the connector can accurately represent the required and optional fields for each action, improving data integrity and reducing errors during the sync process.
 
@@ -250,20 +234,20 @@ snowpilot discover > catalog.json
 2. Extract Mode:
 
 ```shell
-snowpilot extract --config config.json --stream=contacts --fields=id,email,name
+snowpilot extract --config config.json --collection=contacts --fields=id,email,name
 ```
 
 3. Load Mode:
 
 ```shell
-snowpilot load --config config.json --stream=contacts --operation=upsert --fields=email,firstname,lastname
+snowpilot load --config config.json --collection=contacts --operation=upsert --fields=email,firstname,lastname
 ```
 
-These examples demonstrate the command structures for discovery, extract, and load operations in the Snowpilot Connector specification, including the specification of streams, fields, and operations.
+These examples demonstrate the command structures for discovery, extract, and load operations in the Snowpilot Connector specification, including the specification of collections, fields, and operations.
 
-The `relationships` field can be used to understand and maintain referential integrity between streams during the sync process. For example, when syncing related data, ensure that the referenced records are created or updated before the referring records.
+The `relationships` field can be used to understand and maintain referential integrity between collections during the sync process. For example, when syncing related data, ensure that the referenced records are created or updated before the referring records.
 
-This structure allows for precise control over how data is written to and read from the source or target system, taking into account the specific requirements of each operation type and the relationships between streams.
+This structure allows for precise control over how data is written to and read from the source or target system, taking into account the specific requirements of each operation type and the relationships between collections.
 
 ## Error Handling
 
@@ -286,12 +270,12 @@ While the discovery mode is typically invoked locally, developers should still c
 
 ## Usage Examples
 
-### Discovering Streams from a Tap
+### Discovering collections from a Tap
 
 import subprocess
 import json
 
-def discover_streams(snowpilot_command, config_file):
+def discover_collections(snowpilot_command, config_file):
 result = subprocess.run([snowpilot_command, 'discover', '--config', config_file],
 capture_output=True, text=True)
 if result.returncode != 0:
@@ -299,8 +283,8 @@ raise Exception(f"Discovery failed: {result.stderr}")
 
     return json.loads(result.stdout)
 
-streams = discover_streams('snowpilot', 'config.json')
-print(json.dumps(streams, indent=2))
+collections = discover_collections('snowpilot', 'config.json')
+print(json.dumps(collections, indent=2))
 
 ### Discovering Sinks from a Target
 
@@ -323,8 +307,8 @@ print(json.dumps(sinks, indent=2))
 ## Glossary
 
 - **Snowpilot connector**: A component that can act as both a source and a destination for data, supporting discovery, extraction, and loading operations.
-- **stream**: A collection of data, typically representing a table or API endpoint.
-- **Discovery**: A feature of connectors that allows programmatic discovery of available streams and their properties.
+- **collection**: A collection of data, typically representing a table or API endpoint.
+- **Discovery**: A feature of connectors that allows programmatic discovery of available collections and their properties.
 - **json_schema**: A vocabulary that allows you to annotate and validate JSON documents.
 - **create**: Also known as insert. An operation that allows for the creation of new records.
 - **update**: An operation that allows for updating existing records.
@@ -332,13 +316,13 @@ print(json.dumps(sinks, indent=2))
 - **delete**: An operation that removes existing records.
 - **row**: A schema representing the structure of data for read operations.
 - **insert**: A schema defining the structure for creating new records.
-- **relationships**: Information describing how streams are related to each other, including foreign key constraints and cardinality.
-- **Stream id**: A unique identifier for a data stream, used for programmatic reference and to unambiguously identify streams across the system.
-- **Stream name**: A human-readable name for a data stream, suitable for display in user interfaces or reports.
-- **Operation schemas**: Specific schemas for different operations (row, insert, update, upsert, delete) within a stream.
+- **relationships**: Information describing how collections are related to each other, including foreign key constraints and cardinality.
+- **collection id**: A unique identifier for a data collection, used for programmatic reference and to unambiguously identify collections across the system.
+- **collection name**: A human-readable name for a data collection, suitable for display in user interfaces or reports.
+- **Operation schemas**: Specific schemas for different operations (row, insert, update, upsert, delete) within a collection.
 - **discover**: Subcommand for invoking the discovery mode of a Snowpilot connector (e.g., `snowpilot discover`).
-- **extract**: Subcommand for running a Snowpilot connector in extract (source) mode (e.g., `snowpilot extract --config config.json --stream=<stream_id> --fields=id,email,name`).
-- **load**: Subcommand for running a Snowpilot connector in load (destination) mode (e.g., `snowpilot load --config config.json --stream=<stream_id> --operation=<operation_name> --fields=email,firstname,lastname`).
-- **--stream**: Flag used to specify the stream ID to extract from or load to.
+- **extract**: Subcommand for running a Snowpilot connector in extract (source) mode (e.g., `snowpilot extract --config config.json --collection=<collection_id> --fields=id,email,name`).
+- **load**: Subcommand for running a Snowpilot connector in load (destination) mode (e.g., `snowpilot load --config config.json --collection=<collection_id> --operation=<operation_name> --fields=email,firstname,lastname`).
+- **--collection**: Flag used to specify the collection ID to extract from or load to.
 - **--fields**: Flag used to specify a comma-separated list of fields to extract or load.
 - **--operation**: Flag used in load mode to specify the operation type (e.g., insert, update, upsert).

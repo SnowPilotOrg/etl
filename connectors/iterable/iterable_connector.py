@@ -2,7 +2,7 @@ import httpx
 
 
 def discover():
-    """Discover available streams and their schemas."""
+    """Discover available collections and their schemas."""
     print("hello discover")
     headers = {
         "Api-Key": "fake",
@@ -29,11 +29,11 @@ def discover():
     # print(data.decode("utf-8"))
 
 
-def extract(stream_id, fields):
-    """Extract data from the specified stream."""
+def extract(collection_id, fields):
+    """Extract data from the specified collection."""
     print("hello extract")
 
 
-def load(stream_id, operation, fields, data):
-    """Load data into the specified stream."""
+def load(collection_id, operation, fields, data):
+    """Load data into the specified collection."""
     print("hello load")

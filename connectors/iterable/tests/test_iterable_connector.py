@@ -21,8 +21,8 @@ def test_load():
     raise NotImplementedError("Test not implemented")
 
 
-def test_extract_invalid_stream():
-    """Test extract method with invalid stream."""
+def test_extract_invalid_collection():
+    """Test extract method with invalid collection."""
     raise NotImplementedError("Test not implemented")
 
 

@@ -25,7 +25,7 @@ def infer_schema(file_path, fields=None):
 
 
 def discover(config):
-    streams = []
+    collections = []
     csv_path = config["csv_path"]
 
     valid_csv_paths = []
@@ -43,28 +43,28 @@ def discover(config):
     for file_path in valid_csv_paths:
         filename = os.path.basename(file_path)[:-4]  # Remove .csv extension
         schema = infer_schema(file_path)
-        streams.append({"id": filename, "label": filename, "schema": schema})
+        collections.append({"id": filename, "label": filename, "schema": schema})
 
-    return print(json.dumps({"streams": streams}, indent=2))
+    return print(json.dumps({"collections": collections}, indent=2))
 
 
-def extract(config, stream_id, fields):
+def extract(config, collection_id, fields):
     if not fields:
         raise ValueError("Fields are required")
 
     csv_path = config["csv_path"]
     file_path = (
-        os.path.join(csv_path, f"{stream_id}.csv")
+        os.path.join(csv_path, f"{collection_id}.csv")
         if os.path.isdir(csv_path)
         else csv_path
     )
 
     if not os.path.isfile(file_path):
-        raise ValueError(f"Invalid stream: {stream_id}")
+        raise ValueError(f"Invalid collection: {collection_id}")
 
     schema_message = {
         "type": "SCHEMA",
-        "stream": stream_id,
+        "collection": collection_id,
         "schema": infer_schema(file_path, fields),
     }
 
@@ -79,7 +79,7 @@ def extract(config, stream_id, fields):
             filtered_row = {field: row[field] for field in fields if field in row}
             record_message = {
                 "type": "RECORD",
-                "stream": stream_id,
+                "collection": collection_id,
                 "record": filtered_row,
             }
             print(json.dumps(record_message, indent=2))
@@ -87,26 +87,26 @@ def extract(config, stream_id, fields):
     sys.stdout.flush()
 
 
-def load(config, stream_id, operation, fields, data):
+def load(config, collection_id, operation, fields, data):
     valid_operations = ["upsert", "update", "create"]
     if operation not in valid_operations:
         raise ValueError(f"Invalid operation: {operation}")
 
     csv_path = config["csv_path"]
     file_path = (
-        os.path.join(csv_path, f"{stream_id}.csv")
+        os.path.join(csv_path, f"{collection_id}.csv")
         if os.path.isdir(csv_path)
         else csv_path
     )
 
     if not os.path.isfile(file_path):
-        raise ValueError(f"Invalid stream: {stream_id}")
+        raise ValueError(f"Invalid collection: {collection_id}")
 
     # Placeholder implementation
     return json.dumps(
         {
             "success": True,
-            "message": f"Data loaded into {stream_id} using {operation} operation",
+            "message": f"Data loaded into {collection_id} using {operation} operation",
         }
     )
 
@@ -125,19 +125,19 @@ def cli():
     subparsers = parser.add_subparsers(dest="command", required=True)
 
     # Discover subcommand
-    subparsers.add_parser("discover", help="Discover available streams")
+    subparsers.add_parser("discover", help="Discover available collections")
 
     # Extract subcommand
-    extract_parser = subparsers.add_parser("extract", help="Extract data from a stream")
+    extract_parser = subparsers.add_parser("extract", help="Extract data from a collection")
     extract_parser.add_argument(
-        "--stream", required=True, help="ID of the stream to extract"
+        "--collection", required=True, help="ID of the collection to extract"
     )
     extract_parser.add_argument("--fields", nargs="+", help="Fields to extract")
 
     # Load subcommand
-    load_parser = subparsers.add_parser("load", help="Load data into a stream")
+    load_parser = subparsers.add_parser("load", help="Load data into a collection")
     load_parser.add_argument(
-        "--stream", required=True, help="ID of the stream to load data into"
+        "--collection", required=True, help="ID of the collection to load data into"
     )
     load_parser.add_argument(
         "--operation",
@@ -157,7 +157,7 @@ def cli():
     if args.command == "discover":
         discover(config)
     elif args.command == "extract":
-        extract(config, args.stream, args.fields)
+        extract(config, args.collection, args.fields)
     elif args.command == "load":
         data = json.loads(sys.stdin.read())
-        load(config, args.stream, args.operation, args.fields, data)
+        load(config, args.collection, args.operation, args.fields, data)

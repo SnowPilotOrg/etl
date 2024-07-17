@@ -17,22 +17,22 @@ def test_discover():
     # Parse the JSON string
     data = json.loads(result)
 
-    assert "streams" in data
-    streams = data["streams"]
-    assert len(streams) == 3
+    assert "collections" in data
+    collections = data["collections"]
+    assert len(collections) == 3
 
-    stream_ids = [stream["id"] for stream in streams]
-    assert "contacts" in stream_ids
-    assert "customers" in stream_ids
-    assert "orders" in stream_ids
+    collection_ids = [collection["id"] for collection in collections]
+    assert "contacts" in collection_ids
+    assert "customers" in collection_ids
+    assert "orders" in collection_ids
 
-    for stream in streams:
-        assert "id" in stream
-        assert "name" in stream
-        assert "schema" in stream
-        assert stream["id"] == stream["name"]
-        assert "type" in stream["schema"]
-        assert "properties" in stream["schema"]
+    for collection in collections:
+        assert "id" in collection
+        assert "name" in collection
+        assert "schema" in collection
+        assert collection["id"] == collection["name"]
+        assert "type" in collection["schema"]
+        assert "properties" in collection["schema"]
 
 
 def test_discover_contacts_schema():
@@ -40,11 +40,11 @@ def test_discover_contacts_schema():
     result = discover()
     data = json.loads(result)
 
-    contacts_stream = next(
-        stream for stream in data["streams"] if stream["id"] == "contacts"
+    contacts_collection = next(
+        collection for collection in data["collections"] if collection["id"] == "contacts"
     )
-    assert contacts_stream["schema"]["type"] == "object"
-    properties = contacts_stream["schema"]["properties"]
+    assert contacts_collection["schema"]["type"] == "object"
+    properties = contacts_collection["schema"]["properties"]
     assert "id" in properties
     assert "name" in properties
     assert "email" in properties
@@ -57,11 +57,11 @@ def test_discover_customers_schema():
     result = discover()
     data = json.loads(result)
 
-    customers_stream = next(
-        stream for stream in data["streams"] if stream["id"] == "customers"
+    customers_collection = next(
+        collection for collection in data["collections"] if collection["id"] == "customers"
     )
-    assert customers_stream["schema"]["type"] == "object"
-    properties = customers_stream["schema"]["properties"]
+    assert customers_collection["schema"]["type"] == "object"
+    properties = customers_collection["schema"]["properties"]
     assert "customer_id" in properties
     assert "first_name" in properties
     assert "last_name" in properties
@@ -78,11 +78,11 @@ def test_discover_orders_schema():
     result = discover()
     data = json.loads(result)
 
-    orders_stream = next(
-        stream for stream in data["streams"] if stream["id"] == "orders"
+    orders_collection = next(
+        collection for collection in data["collections"] if collection["id"] == "orders"
     )
-    assert orders_stream["schema"]["type"] == "object"
-    properties = orders_stream["schema"]["properties"]
+    assert orders_collection["schema"]["type"] == "object"
+    properties = orders_collection["schema"]["properties"]
     assert "order_id" in properties
     assert "product_name" in properties
     assert "quantity" in properties
@@ -134,10 +134,10 @@ def test_load():
     assert result is True  # Assuming successful load returns True
 
 
-def test_extract_invalid_stream():
-    """Test extract method with invalid stream."""
+def test_extract_invalid_collection():
+    """Test extract method with invalid collection."""
     with pytest.raises(ValueError):
-        extract("invalid_stream", ["id"])
+        extract("invalid_collection", ["id"])
 
 
 def test_load_invalid_operation():
