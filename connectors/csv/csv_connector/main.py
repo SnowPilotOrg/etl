@@ -1,3 +1,4 @@
+import csv
 from typing import Optional
 
 import jsonc
@@ -8,17 +9,44 @@ from typing_extensions import Annotated
 
 err_console = Console(stderr=True)
 app = typer.Typer()
+state = {"config": None}
+
+
+def infer_schema(csv_path: str, fields: Optional[list[str]] = None) -> dict:
+    """Infer the schema of the CSV file."""
+    with open(csv_path, "r") as csvfile:
+        headers = next(csv.reader(csvfile))
+        selected_headers = (
+            headers
+            if fields is None
+            else [header for header in headers if header in fields]
+        )
+        properties = {header: {"type": "string"} for header in selected_headers}
+
+    return {"type": "object", "properties": properties}
+
+
+# OPEN Q: Meta command? Get the schema of the config file
+
+
+@app.callback()
+def config(
+    config_file: Annotated[
+        typer.FileText,
+        typer.Option("--config", "-c", help="Path to the configuration file"),
+    ],
+):
+    """Provide the path to the configuration file."""
+    config = jsonc.load(config_file)
+    # TODO: Validate the config before setting it
+    state["config"] = config
 
 
 @app.command()
-def discover(
-    config_path: Annotated[str, typer.Option(help="Path to the configuration file")],
-):
+def discover():
     """Discover available streams and their schemas."""
-    typer.echo("Discovering available streams and their schemas")
-    with open(config_path, "r") as file:
-        config = jsonc.load(file)
-    print(config)
+    csv_path = state["config"]["csv_path"]
+    print(csv_path)
 
 
 @app.command()
