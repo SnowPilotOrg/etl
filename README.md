@@ -21,3 +21,10 @@ Differences between the Snowpilot Spec and the Singer Spec:
 - Discovery of schemas for for extraction and loading (Singer requires discovery only on the extraction side)
 - Per-operation schemas, again to account for the sometimes-differing shape of insert/update/upsert APIs found in SaaS products. This approach is inspired by the Typescript type generation done by Supabase.
 - No concept of state capture or incremental replication. NOTE: this may change in the future, but this spec is meant to cover only simple cases to begin with.
+
+
+Potential future explorations:
+- Passing data over channels other than stdin/stdout
+- Producing schemas and data in Arrow format, instead of JSONL
+- Writing all connectors as ODBC/JDBC drivers
+- Writing all connectors as foreign data wrappers/UDFs for DuckDB/Datafusion/Postgres/Sqlite/ClickHouse
